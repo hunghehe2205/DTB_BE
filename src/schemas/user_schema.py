@@ -5,7 +5,6 @@ from pydantic import BaseModel, EmailStr
 
 class UserCreate(BaseModel):
     fname: str
-    lname: str
     email: EmailStr
     username: str
     password: str
@@ -15,7 +14,6 @@ class UserCreate(BaseModel):
 
 class UserUpdate(BaseModel):
     fname: str = None
-    lname: str = None
     email: EmailStr = None
     username: str = None
     password: str = None
@@ -26,7 +24,6 @@ class UserUpdate(BaseModel):
 class UserResponse(BaseModel):
     user_id: str
     fname: str
-    lname: str
     email: EmailStr
     username: str
     phonenumber: str

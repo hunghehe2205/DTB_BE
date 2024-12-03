@@ -37,7 +37,7 @@ class UserModel():
         connection.close()
         return next_user_id
 
-    def create_user(self, fname: str, lname: str,
+    def create_user(self, fname:str,
                     email: EmailStr, username: str, password: str,
                     phonenumber: str):
 
@@ -46,9 +46,8 @@ class UserModel():
             try:
                 cursor = connection.cursor(dictionary=True)
                 get_user_id = self.generate_user_id()
-                insert_query = "INSERT INTO User (UserID, FName, LName, Email, UserName, Password, PhoneNumber) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                cursor.execute(insert_query, (get_user_id, fname,
-                               lname, email, username, password, phonenumber))
+                insert_query = "INSERT INTO User (UserID, FullName, Email, UserName, Password, PhoneNumber) VALUES (%s, %s, %s, %s, %s, %s)"
+                cursor.execute(insert_query, (get_user_id, fname, email, username, password, phonenumber))
                 connection.commit()
                 return {'message': 'Registration successfully'}
             except Error as e:
@@ -60,14 +59,14 @@ class UserModel():
                 connection.close()
         return {'error': 'Failed to connect to the database'}
 
-    def update_user(self, user_id: str, fname: Optional[str] = None, lname: Optional[str] = None, email: Optional[EmailStr] = None,
+    def update_user(self, user_id: str, fname: Optional[str] = None, email: Optional[EmailStr] = None,
                     username: Optional[str] = None, password: Optional[str] = None, phonenumber: Optional[str] = None):
         connection = self.get_db_connection()
         if connection:
             try:
                 cursor = connection.cursor(dictionary=True)
                 cursor.callproc(
-                    "UpdateUser", [user_id, fname, lname, email, username, password, phonenumber])
+                    "UpdateUser", [user_id, fname, email, username, password, phonenumber])
                 connection.commit()
                 return {'message': 'Updated successfully'}
             except Error as e:
