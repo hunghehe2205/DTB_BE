@@ -12,3 +12,7 @@ app.include_router(mem_router, tags=["Membership"])
 app.include_router(book_router, tags=["Book"])
 app.include_router(trans_router, tags=['Transaction'])
 app.include_router(fb_router, tags=['Feedback'])
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
