@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from datetime import datetime, date
 
 # Pydantic model for user registration request
 
@@ -28,3 +29,20 @@ class UserResponse(BaseModel):
     username: str
     phonenumber: str
     streak: int
+
+
+class TransactUserID(BaseModel):
+    transactionID: str
+    transactionDate: datetime
+
+
+class MemUserID(BaseModel):
+    type: str
+    expired_date: date
+    remaining_books: int
+
+
+class FullUserResponse(BaseModel):
+    user_info: UserResponse
+    transact_info: TransactUserID
+    mem_info: MemUserID

@@ -37,7 +37,7 @@ class UserModel():
         connection.close()
         return next_user_id
 
-    def create_user(self, fname:str,
+    def create_user(self, fname: str,
                     email: EmailStr, username: str, password: str,
                     phonenumber: str):
 
@@ -47,7 +47,8 @@ class UserModel():
                 cursor = connection.cursor(dictionary=True)
                 get_user_id = self.generate_user_id()
                 insert_query = "INSERT INTO User (UserID, FullName, Email, UserName, Password, PhoneNumber) VALUES (%s, %s, %s, %s, %s, %s)"
-                cursor.execute(insert_query, (get_user_id, fname, email, username, password, phonenumber))
+                cursor.execute(insert_query, (get_user_id, fname,
+                               email, username, password, phonenumber))
                 connection.commit()
                 return {'message': 'Registration successfully'}
             except Error as e:
@@ -104,7 +105,7 @@ class UserModel():
                 user_data = None
                 for result in cursor.stored_results():
                     user_data = result.fetchone()
-
+                connection.commit()
             # Check if user data was found
                 if user_data:
                     return user_data
@@ -130,6 +131,7 @@ class UserModel():
                 cursor.execute(query)
                 # Fetch all users
                 user_list = cursor.fetchall()
+                connection.commit()
                 # Check if there are any users
                 if user_list:
                     return user_list
@@ -146,4 +148,64 @@ class UserModel():
                     cursor.close()
                 connection.close()
 
+        return {'error': 'Failed to connect to the database'}
+
+    def get_full_user(self, user_id: str):
+        connection = self.get_db_connection()
+        if connection:
+            try:
+                cursor = connection.cursor(dictionary=True)
+                cursor.callproc("AllPropertiesOfUserID", [user_id])
+                user_data = None
+                for result in cursor.stored_results():
+                    user_data = result.fetchone()
+
+            # Check if user data was found
+                connection.commit()
+                return user_data
+            except Error as e:
+                result = {'error': f'[{e.msg}]'}
+                connection.rollback()
+                return result
+            finally:
+                cursor.close()
+                connection.close()
+        return {'error': 'Failed to connect to the database'}
+
+    def log_in(self, user_name: str, password: str):
+        connection = self.get_db_connection()
+        if connection:
+            try:
+                cursor = connection.cursor(dictionary=True)
+
+                # Call the stored procedure
+                cursor.callproc("CheckLogin", [user_name, password])
+
+                # Fetch results from the stored procedure using stored_results()
+                user_id = None
+                for result in cursor.stored_results():
+                    user_data = result.fetchone()
+                    if user_data:
+                        user_id = user_data  # Assign user_data if login is successful
+
+                # Commit if needed (although there might be no changes to commit in a login process)
+                connection.commit()
+
+                # If user_id is still None, the login information is incorrect
+                if user_id['UserID'] is None:
+                    return {'error': 'Wrong login info'}
+
+                return user_id  # Return the UserID if found
+
+            except Error as e:
+                # Handle database error
+                connection.rollback()
+                return {'error': f'[{e.msg}]'}
+
+            finally:
+                if cursor:
+                    cursor.close()
+                connection.close()
+
+        # Return error if connection fails
         return {'error': 'Failed to connect to the database'}

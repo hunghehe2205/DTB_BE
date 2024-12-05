@@ -107,7 +107,7 @@ class BookModel():
 
             # Check if user data was found
                 if book_data:
-                    return book_data 
+                    return book_data
                 else:
                     return {'error': 'Book not found'}
 
@@ -119,7 +119,7 @@ class BookModel():
                 cursor.close()
                 connection.close()
         return {'error': 'Failed to connect to the database'}
-    
+
     def get_book_list(self):
         connection = self.get_db_connection()
         if connection:
@@ -136,6 +136,28 @@ class BookModel():
                 elif book_list == {}:
                     return {'message': 'No book found'}
 
+            except Error as e:
+                result = {'error': f'MySQL Error: [{e.msg}]'}
+                connection.rollback()
+                return result
+
+            finally:
+                if cursor:
+                    cursor.close()
+                connection.close()
+
+        return {'error': 'Failed to connect to the database'}
+
+    def get_book_by_cat(self, category: str):
+        connection = self.get_db_connection()
+        if connection:
+            try:
+                cursor = connection.cursor(dictionary=True)
+                cursor.callproc("getAllBookCategory", [category])
+                book_list = []
+                for result in cursor.stored_results():
+                    book_list = result.fetchall()
+                return book_list
             except Error as e:
                 result = {'error': f'MySQL Error: [{e.msg}]'}
                 connection.rollback()

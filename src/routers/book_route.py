@@ -36,6 +36,23 @@ def update_book(book_id: str, book_update: BookUpdate, book_model: BookModel = D
     return result['message']
 
 
+@router.get('/books/{category}', response_model=list[BookResponse], status_code=status.HTTP_200_OK)
+def get_book_by_cat(category: str, book_model: BookModel = Depends(get_connection)):
+    book_list = book_model.get_book_by_cat(category)
+    res = []
+    if 'error' in book_list:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=book_list["error"])
+
+    for result in book_list:
+        book = BookResponse(bookid=result['BookID'], title=result['Title'],
+                            publication_date=result['PublicationDate'],
+                            rating=result['Rating'], release_date=result['ReleaseDate'])
+        res.append(book)
+
+    return res
+
+
 @router.get('/book/{book_id}', response_model=BookResponse, status_code=status.HTTP_200_OK)
 def get_book_by_id(book_id: str, book_model: BookModel = Depends(get_connection)):
     result = book_model.get_book_by_id(book_id=book_id)
@@ -49,7 +66,7 @@ def get_book_by_id(book_id: str, book_model: BookModel = Depends(get_connection)
     return res
 
 
-@router.get('/book/', status_code=status.HTTP_200_OK)
+@router.get('/books/', status_code=status.HTTP_200_OK)
 def get_book_list(book_model: BookModel = Depends(get_connection)):
     book_list = book_model.get_book_list()
     res = []
