@@ -23,15 +23,13 @@ def create_feedback(fb_create: FeedbackCreate, fb_model: FeedbackModel = Depends
     return response['message']
 
 
-@router.get('/feedback/{user_id}/{book_id}', response_model=FeedbackResponse, status_code=status.HTTP_200_OK)
-def get_feedback(user_id: str, book_id: str, fb_model: FeedbackModel = Depends(get_connection)):
-    result = fb_model.get_feedback(user_id=user_id, book_id=book_id)
+@router.get('/feedback/{book_id}', status_code=status.HTTP_200_OK)
+def get_feedback(book_id: str, fb_model: FeedbackModel = Depends(get_connection)):
+    result = fb_model.get_feedback(book_id=book_id)
     if 'error' in result:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=result["error"])
 
-    res = FeedbackResponse(user_id=result['UserID'], book_id=result['BookID'],
-                           comment=result['Comment'], rating=result['Rating'],
-                           time=result['Time'])
+    return result
 
-    return res
+

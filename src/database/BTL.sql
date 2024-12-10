@@ -555,12 +555,13 @@ DELIMITER ;
 
 DELIMITER //
 Use ebook //
-CREATE TRIGGER update_type_after_transact
+CREATE TRIGGER update_info_after_transact
 AFTER INSERT ON Transaction
 FOR EACH ROW
 BEGIN
 	UPDATE Membership
     SET 
+        
 		Type = NEW.Type,
 		ExpiredDay = (CURDATE() + INTERVAL 30 DAY)
     WHERE UserID = NEW.UserID;
@@ -767,6 +768,7 @@ DELIMITER ;
 
 
 DELIMITER $$
+DROP TRIGGER DecreaseRemainingBooks IF EXISTS;
 
 CREATE TRIGGER DecreaseRemainingBooks
 BEFORE INSERT ON Access

@@ -25,3 +25,13 @@ def insert_access(access: AccessCreate, access_model: AccessModel = Depends(get_
             status_code=status.HTTP_400_BAD_REQUEST, detail=response["error"])
 
     return response['message']
+
+
+@router.get('/access/{user_id}', status_code=status.HTTP_200_OK)
+def get_access_book(user_id: str, model: AccessModel = Depends(get_connection)):
+    result = model.get_access(user_id)
+    if 'error' in result:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=result["error"])
+
+    return result

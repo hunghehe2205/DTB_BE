@@ -16,6 +16,7 @@ class BookResponse(BaseModel):
     publication_date: date
     rating: float
     release_date: date
+    
 
 
 class BookUpdate(BaseModel):

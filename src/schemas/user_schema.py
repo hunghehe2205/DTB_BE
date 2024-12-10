@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime, date
+from typing import Optional
 
 # Pydantic model for user registration request
 
@@ -32,8 +33,8 @@ class UserResponse(BaseModel):
 
 
 class TransactUserID(BaseModel):
-    transactionID: str
-    transactionDate: datetime
+    transactionID: Optional[str] = None
+    transactionDate: Optional[datetime] = None
 
 
 class MemUserID(BaseModel):

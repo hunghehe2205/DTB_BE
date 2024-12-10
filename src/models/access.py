@@ -33,3 +33,35 @@ class AccessModel():
                 cursor.close()
                 connection.close()
         return {'error': 'Failed to connect to the database'}
+
+    def get_access(self, user_id: str):
+        connection = self.get_db_connection()
+        if connection:
+            try:
+                cursor = connection.cursor(dictionary=True)
+                query = '''
+                    SELECT 
+                        b.BookID,
+                        b.Title,
+                        b.Author,
+                        b.PublicationDate,
+                        b.Rating,
+                        b.ReleaseDate
+                    FROM 
+                        Access a
+                    JOIN 
+                        Book b ON a.BookID = b.BookID
+                    WHERE 
+                        a.UserID = %s; -- Replace 'U-001' with the desired UserID
+                    '''
+                cursor.execute(query, (user_id,))
+                books = cursor.fetchall()
+                return books
+            except Error as e:
+                result = {'error': f'[{e.msg}]'}
+                connection.rollback()
+                return result
+            finally:
+                cursor.close()
+                connection.close()
+        return {'error': 'Failed to connect to the database'}

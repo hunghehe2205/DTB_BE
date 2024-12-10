@@ -24,9 +24,9 @@ class FeedbackModel():
                 cursor = connection.cursor(dictionary=True)
                 cursor.callproc('InsertFeedback', [
                                 user_id, book_id, comment, rating])
-                
+
                 connection.commit()
-                return {'message' : 'Created successfully'}
+                return {'message': 'Created successfully'}
             except Error as e:
                 result = {'error': f'[{e.msg}]'}
                 connection.rollback()
@@ -35,20 +35,20 @@ class FeedbackModel():
                 cursor.close()
                 connection.close()
         return {'error': 'Failed to connect to the database'}
-    
-    def get_feedback(self, user_id:str, book_id:str):
+
+    def get_feedback(self, book_id: str):
         connection = self.get_db_connection()
         if connection:
             try:
                 cursor = connection.cursor(dictionary=True)
-                cursor.callproc("GetFeedback", [user_id,book_id])
-                book_data = None
-                for result in cursor.stored_results():
-                    book_data = result.fetchone()
-
+                query = 'SELECT * FROM Feedback WHERE BookID = %s'
+                cursor.execute(query, (book_id,))
+                feed_back = None
+                feed_back = cursor.fetchall()
+                connection.commit()
             # Check if user data was found
-                if book_data:
-                    return book_data 
+                if feed_back:
+                    return feed_back
                 else:
                     return {'error': 'Feedback not found'}
 
