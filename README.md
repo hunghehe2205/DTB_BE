@@ -1,2 +1,2 @@
 # BookHub
- DCMM
+ This is a Backend of Database Management System Project from HCMUT
